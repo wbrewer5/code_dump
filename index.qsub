@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l partition=monster,nodes=1:ppn=24,walltime=1:00:00
+#PBS -n
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/macrosiphum/bwa/log/
+#PBS -e /lustre/haven/user/wbrewer5/macrosiphum/bwa/error/
+#PBS -N macrosiphum_bwa_index
+
+cd $PBS_O_WORKDIR
+module load bwa
+
+bwa index -p macrosiphum.contigs.fasta -a is /lustre/haven/user/wbrewer5/macrosiphum/canu/output/macrosiphum.contigs.fasta

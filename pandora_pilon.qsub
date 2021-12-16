@@ -1,0 +1,22 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l partition=bigmem,nodes=1:ppn=24,walltime=24:00:00
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/pandora/assembly/pilon/log/
+#PBS -e /lustre/haven/user/wbrewer5/pandora/assembly/pilon/error/
+#PBS -N pandora_pilon
+
+cd $PBS_O_WORKDIR
+
+module load anaconda3
+source $ANACONDA3_SH
+conda activate pilon
+
+pilon -Xmx256G --genome /lustre/haven/user/wbrewer5/pandora/assembly/canu/output/pandora_actual.contigs.fasta \
+--bam /lustre/haven/user/wbrewer5/pandora/assembly/bwa/output/pandora.sorted.bam \
+--outdir /lustre/haven/user/wbrewer5/pandora/assembly/pilon/output \
+--tracks \
+--threads 24
+

@@ -1,0 +1,22 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l partition=beacon,nodes=1:ppn=16,walltime=24:00:00
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/pandora/assembly/haslr/log/
+#PBS -e /lustre/haven/user/wbrewer5/pandora/assembly/haslr/error/
+#PBS -N pandora_haslr
+
+cd $PBS_O_WORKDIR
+
+module load anaconda3
+source $ANACONDA3_SH
+conda activate haslr
+
+
+haslr.py -o /lustre/haven/user/wbrewer5/pandora/assembly/haslr/output \
+-g 300m \
+-l /lustre/haven/user/wbrewer5/pandora/assembly/fastq/pandora_clean_nanopore.fastq.gz \
+-x nanopore \
+-s /lustre/haven/user/wbrewer5/pandora/assembly/fastq/Pand2_CSFP210000778-1a_HVGWJDSXY_L1_1.fastq.gz /lustre/haven/user/wbrewer5/pandora/assembly/fastq/Pand2_CSFP210000778-1a_HVGWJDSXY_L1_2.fastq.gz

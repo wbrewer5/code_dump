@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l partition=beacon:rho:general,nodes=1,walltime=2:00:00
+#PBS -n
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/macrosiphum/bwa/log/
+#PBS -e /lustre/haven/user/wbrewer5/macrosiphum/bwa/error/
+#PBS -N macrosiphum_bwa_mem
+
+cd $PBS_O_WORKDIR
+
+
+module load bwa
+
+bwa mem -t 16 -P -v 2 \
+/lustre/haven/user/wbrewer5/macrosiphum/bwa/output/macrosiphum_nanopore.contigs.fasta \
+/lustre/haven/user/wbrewer5/macrosiphum/raw/macrosiphum.fastq.gz \
+> /lustre/haven/user/wbrewer5/macrosiphum/bwa/output/macrosiphum.sam
+

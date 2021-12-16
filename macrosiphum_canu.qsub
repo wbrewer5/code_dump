@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l partition=bigmem,nodes=1,walltime=1:00:00
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/macrosiphum/canu/log/
+#PBS -e /lustre/haven/user/wbrewer5/macrosiphum/canu/error/
+#PBS -N macrosiphum_canu
+#PBS -n
+
+cd $PBS_O_WORKDIR
+
+module load canu/2.0
+module load gnuplot
+
+canu -d /lustre/haven/user/wbrewer5/macrosiphum/canu/output_2 \
+-p macrosiphum \
+minOverlapLength=1000 \
+genomeSize=800m \
+-nanopore /lustre/haven/user/wbrewer5/macrosiphum/raw/macrosiphum_nanopore.fastq.gz \
+gridEngineResourceOption="-l partition=beacon,nodes=1:ppn=8,walltime=24:00:00 -A ACF-UTK0011"
+
+#The partition designation in the header is only for submission of the scheduling script.
+#Final code line specifies the partition used for the actual computation. Wacky stuff going on here.

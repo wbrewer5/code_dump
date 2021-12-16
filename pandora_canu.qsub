@@ -1,0 +1,22 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l partition=beacon:rho:general,nodes=1,walltime=30:00
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/pandora/assembly/canu/log/
+#PBS -e /lustre/haven/user/wbrewer5/pandora/assembly/canu/error/
+#PBS -N pandora_canu
+#PBS -n
+
+cd $PBS_O_WORKDIR
+
+module load canu/2.0
+module load gnuplot
+
+canu -d /lustre/haven/user/wbrewer5/pandora/assembly/canu/output \
+-p pandora_actual \
+genomeSize=110m \
+-nanopore /lustre/haven/user/wbrewer5/pandora/assembly/fastq/zipped/*fastq.gz \
+gridEngineResourceOption="-l partition=beacon,nodes=1:ppn=8,walltime=24:00:00 -A ACF-UTK0011"
+

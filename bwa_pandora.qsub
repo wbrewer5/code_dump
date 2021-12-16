@@ -1,0 +1,35 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l partition=bigmem,nodes=1:ppn=48,walltime=24:00:00
+#PBS -n
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/pandora/assembly/bwa/log/
+#PBS -e /lustre/haven/user/wbrewer5/pandora/assembly/bwa/error/
+#PBS -N pandora_bwa_mem
+
+
+cd $PBS_O_WORKDIR
+
+
+module load bwa
+
+bwa index -p pandora_actual.contigs.fasta -a is /lustre/haven/user/wbrewer5/pandora/assembly/bwa/pandora_actual.contigs.fasta
+
+bwa mem -t 24 -P -v 2 \
+/lustre/haven/user/wbrewer5/pandora/assembly/bwa/pandora_actual.contigs.fasta \
+/lustre/haven/user/wbrewer5/pandora/assembly/fastq/Pand2_fwd.fastq \
+/lustre/haven/user/wbrewer5/pandora/assembly/fastq/Pand2_rev.fastq \
+> /lustre/haven/user/wbrewer5/pandora/assembly/bwa/pandora.sam
+
+module load samtools
+
+samtools view -@ 24 -b /lustre/haven/user/wbrewer5/pandora/assembly/bwa/pandora.sam > /lustre/haven/user/wbrewer5/pandora/assembly/bwa/output/pandora.bam
+
+samtools sort -@ 24 /lustre/haven/user/wbrewer5/pandora/assembly/bwa/output/pandora.bam > /lustre/haven/user/wbrewer5/pandora/assembly/bwa/output/pandora.sorted.bam
+
+samtools index -b /lustre/haven/user/wbrewer5/pandora/assembly/bwa/output/pandora.sorted.bam
+
+
+

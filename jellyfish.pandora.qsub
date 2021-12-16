@@ -1,0 +1,23 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l partition=bigmem,nodes=1,walltime=1:00:00
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/pandora/assembly/jellyfish/
+#PBS -e /lustre/haven/user/wbrewer5/pandora/assembly/jellyfish/
+#PBS -N pandora_jellyfish
+#PBS -n
+
+cd $PBS_O_WORKDIR
+
+module load jellyfish
+
+jellyfish count -m 21 -s 32000000000 -t 48 -C /lustre/haven/user/wbrewer5/pandora/assembly/fastq/Pand2_fwd.fastq -o /lustre/haven/user/wbrewer5/pandora/assembly/jellyfish/Pand2_fwd.jf
+jellyfish histo -t 48 /lustre/haven/user/wbrewer5/pandora/assembly/jellyfish/Pand2_fwd.jf > /lustre/haven/user/wbrewer5/pandora/assembly/jellyfish/Pand2_fwd.histo
+
+jellyfish count -m 21 -s 32000000000 -t 48 -C /lustre/haven/user/wbrewer5/pandora/assembly/fastq/Pand2_rev.fastq -o /lustre/haven/user/wbrewer5/pandora/assembly/jellyfish/Pand2_rev.jf
+jellyfish histo -t 48 /lustre/haven/user/wbrewer5/pandora/assembly/jellyfish/Pand2_fwd.jf > /lustre/haven/user/wbrewer5/pandora/assembly/jellyfish/Pand2_rev.histo
+
+jellyfish count -m 21 -s 32000000000 -t 48 -C /lustre/haven/user/wbrewer5/pandora/assembly/fastq/pandora_clean_nanopore.fastq -o /lustre/haven/user/wbrewer5/pandora/assembly/jellyfish/pandora_clean_nanopore.jf
+jellyfish histo -t 48 /lustre/haven/user/wbrewer5/pandora/assembly/jellyfish/pandora_clean_nanopore.jf > /lustre/haven/user/wbrewer5/pandora/assembly/jellyfish/pandora_clean_nanopore.histo

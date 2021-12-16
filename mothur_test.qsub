@@ -1,0 +1,55 @@
+#PBS -l partition=bigmem,nodes=1:ppn=48,walltime=24:00:00
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/pandora/mothur/test/output/
+#PBS -e /lustre/haven/user/wbrewer5/pandora/mothur/test/error/
+#PBS -N Mothur_test
+#PBS -n
+
+	cd $PBS_O_WORKDIR
+
+module load mothur/1.42.3
+module load vsearch
+
+mothur "#make.file(inputdir=/lustre/haven/user/wbrewer5/pandora/mothur/test, type=fastq, prefix=stability);\
+make.contigs(file=stability.files);\
+screen.seqs(fasta=stability.trim.contigs.fasta, group=stability.contigs.groups, maxambig=0, minlength=430, maxlength=475);\
+summary.seqs(fasta=current);\
+unique.seqs(fasta=current);summary.seqs(fasta=current);\
+count.seqs(name=current, group=current);summary.seqs(fasta=current, count=current);\
+align.seqs(fasta=current, reference=silva.bacteria.pcr.fasta);\
+summary.seqs(fasta=current, count=current);\
+screen.seqs(fasta=current, count=current, summary=current, start=1, end=18928, maxhomop=8);\
+unique.seqs(fasta=current, count=current);\
+summary.seqs(fasta=current, count=current);\
+pre.cluster(fasta=current, count=current, diffs=4);\
+summary.seqs(fasta=current, count=current);\
+chimera.vsearch(fasta=current, count=current);\
+remove.seqs(accnos=stability.trim.contigs.good.unique.good.unique.precluster.denovo.vsearch.accnos, fasta=stability.trim.contigs.good.unique.good.unique.precluster.align, count=stability.trim.contigs.good.unique.good.unique.precluster.count_table);\
+summary.seqs(fasta=current, count=current)"
+
+module unload mothur/1.42.3
+module load mothur
+
+mothur "#list.seqs(inputdir=/lustre/haven/user/wbrewer5/pandora/mothur/test, fasta=stability.trim.contigs.good.unique.good.unique.precluster.NFH2O.fasta);\
+remove.seqs(accnos=stability.trim.contigs.good.unique.good.unique.precluster.NFH2O.accnos, fasta=stability.trim.contigs.good.unique.good.unique.precluster.align, count=stability.trim.contigs.good.unique.good.unique.precluster.count_table);\
+summary.seqs(fasta=current, count=current)"
+
+module unload mothur
+module load mothur/1.42.3
+
+mothur "#chimera.vsearch(inputdir=/lustre/haven/user/wbrewer5/pandora/mothur/test, fasta=stability.trim.contigs.good.unique.good.unique.precluster.pick.align , count=stability.trim.contigs.good.unique.good.unique.precluster.pick.count_table);\
+remove.seqs(fasta=current, accnos=current);\
+remove.seqs(count=current, accnos=current);\
+summary.seqs(fasta=current, count=current);\
+classify.seqs(fasta=current, count=current, reference=trainset9_032012.pds.fasta, taxonomy=trainset9_032012.pds.tax);\
+remove.lineage(fasta=current, count=current, taxonomy=current, taxon=Chloroplast-Mitochondria-unknown-Archaea-Eukaryota);\
+summary.tax(taxonomy=current, count=current);\
+summary.seqs(fasta=current, count=current);\
+dist.seqs(fasta=stability.trim.contigs.good.unique.good.unique.precluster.pick.pick.pick.align, cutoff=0.03);\
+cluster(column=current, count=stability.trim.contigs.good.unique.good.unique.precluster.pick.pick.pick.count_table);\
+make.shared(list=stability.trim.contigs.good.unique.good.unique.precluster.pick.pick.pick.opti_mcc.list, count=current, label=0.03);\
+classify.otu(list=current, count=current, taxonomy=stability.trim.contigs.good.unique.good.unique.precluster.pick.pick.pds.wang.pick.taxonomy, label=0.03);\
+count.groups(shared=current)"
+

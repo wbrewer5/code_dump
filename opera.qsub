@@ -1,0 +1,26 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l partition=bigmem,nodes=1:ppn=48,walltime=1:00:00:00
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/pandora/assembly/opera/log/
+#PBS -e /lustre/haven/user/wbrewer5/pandora/assembly/opera/error/
+#PBS -N pandora_opera
+#PBS -n
+
+cd $PBS_O_WORKDIR
+
+module load anaconda3/4.4.0
+source $ANACONDA3_SH
+
+module load r/3.4.0
+
+perl /lustre/haven/user/wbrewer5/OPERA-MS/OPERA-MS.pl \
+    --short-read1 /lustre/haven/user/wbrewer5/pandora/assembly/fastq/Pand2_fwd.fastq \
+    --short-read2 /lustre/haven/user/wbrewer5/pandora/assembly/fastq/Pand2_rev.fastq \
+    --long-read /lustre/haven/user/wbrewer5/pandora/assembly/fastq/pandora_actual.contigs.fasta \
+    --out-dir /lustre/haven/user/wbrewer5/pandora/assembly/opera \
+    --num-processors 48
+
+#not a huge fan of the output from any assemblies

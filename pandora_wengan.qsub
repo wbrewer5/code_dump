@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l partition=bigmem,nodes=1:ppn=24,walltime=24:00:00
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/pandora/assembly/wengan/log/
+#PBS -e /lustre/haven/user/wbrewer5/pandora/assembly/wengan/error/
+#PBS -N pandora_wengan
+#PBS -n
+
+cd $PBS_O_WORKDIR
+
+module load perl
+
+/lustre/haven/user/wbrewer5/wengan/wengan.pl -x ontraw -a D \
+-s /lustre/haven/user/wbrewer5/pandora/assembly/fastq/zipped/Pand2_fwd.fastq.gz,/lustre/haven/user/wbrewer5/pandora/assembly/fastq/zipped/Pand2_rev.fastq.gz \
+-l /lustre/haven/user/wbrewer5/pandora/assembly/fastq/zipped/pandora_clean_nanopore.fastq.gz \
+-p pandora \
+-t 24 \
+-g 20 

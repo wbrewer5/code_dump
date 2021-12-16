@@ -1,0 +1,23 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l qos=long-utk,partition=beacon,nodes=4:ppn=16,walltime=72:00:00
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/pandora/assembly/flye/output/
+#PBS -e /lustre/haven/user/wbrewer5/pandora/assembly/flye/error/
+#PBS -N pandora_flye
+
+cd $PBS_O_WORKDIR
+
+module load anaconda3
+source $ANACONDA3_SH
+conda activate flye
+
+flye --nano-raw /lustre/haven/user/wbrewer5/pandora/assembly/fastq/pandora_clean_nanopore.fastq.gz \
+-o /lustre/haven/user/wbrewer5/pandora/assembly/flye \
+-g 300m \
+-i 0 \
+--resume \
+--plasmids
+
