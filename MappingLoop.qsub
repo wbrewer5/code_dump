@@ -1,0 +1,73 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l partition=bigmem,nodes=1:ppn=16,walltime=1:00:00:00
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -e /lustre/haven/user/wbrewer5/pandora/lowcov/error/
+#PBS -o /lustre/haven/user/wbrewer5/pandora/lowcov/log/
+#PBS -N PandoraLowCovMapping1
+#PBS -n
+
+cd $PBS_O_WORKDIR
+
+set -x
+module load samtools
+module load bwa
+
+#create indexes for pea aphid and pandora genomes
+#bwa index -p pea_aphid.fna pea_aphid.fna
+#bwa index -p pandora_canu_pilon.fasta pandora_canu_pilon.fasta
+
+#map read files to the aphid genome and keep reads that do not map
+for r1 in /lustre/haven/user/wbrewer5/pandora/lowcov/reads/*R1.fastq
+
+do
+  r2=$(sed 's/R1.fastq/R2.fastq/' <<< "$r1")
+  BASE1=$(basename $r1 | sed 's/_R1.fastq*//g')
+  echo "r1 $r1"
+  echo "r2 $r2"
+  echo "BASE1 $BASE1"
+
+  bwa mem -t 16 -v 3 \
+  pea_aphid.fna \
+  "$r1" \
+  "$r2" |
+  samtools view -@ 16 -u -f 12 -F 256 - |
+  samtools sort -@ 16 -n - |
+  samtools fastq - \
+  -1 /lustre/haven/user/wbrewer5/pandora/lowcov/1_samtools/$BASE1\_unmapped_R1.fastq \
+  -2 /lustre/haven/user/wbrewer5/pandora/lowcov/1_samtools/$BASE1\_unmapped_R2.fastq \
+  -0 /lustre/haven/user/wbrewer5/pandora/lowcov/1_samtools/$BASE1\_trash.txt \
+  -s /lustre/haven/user/wbrewer5/pandora/lowcov/1_samtools/$BASE1\_more_trash.txt
+
+  echo "Step 1: mapped reads from $BASE1 to aphid genome and saved to 1_samtools as paired end .fastq"
+
+done
+
+rm /lustre/haven/user/wbrewer5/pandora/lowcov/1_samtools/*trash*
+
+echo "saving unmapped reads to new fastq files complete!"
+
+for f1 in /lustre/haven/user/wbrewer5/pandora/lowcov/1_samtools/*unmapped_R1.fastq
+
+do
+  f2=$(sed 's/R1.fastq/R2.fastq/' <<< "$f1")
+  BASE2=$(basename $f1 | sed 's/_R1.fastq*//g')
+  echo "f1 $f1"
+  echo "f2 $f2"
+  echo "BASE2 $BASE2"
+
+  bwa mem -t 16 -v 3 \
+  pandora_canu_pilon.fasta \
+  "$f1" \
+  "$f2" |
+  samtools sort -@ 16 -o /lustre/haven/user/wbrewer5/pandora/lowcov/2_angsd/$BASE2\.bam -
+
+  echo "Step 2: mapped reads from $BASE2 to pandora genome saved to 2_angsd as .bam"
+
+done
+
+echo "Mapping new fastq files to pandora genome complete!!"
+
+#qsub /lustre/haven/user/wbrewer5/pandora/lowcov/2_angsd/angsd.qsub

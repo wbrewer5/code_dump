@@ -1,0 +1,47 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l partition=bigmem,nodes=1:ppn=48,walltime=1:00:00:00
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/pandora/novaseq/aphid_genome/251/log/
+#PBS -e /lustre/haven/user/wbrewer5/pandora/novaseq/aphid_genome/251/error/
+#PBS -N reads_not_mapped_to_aphid_251
+#PBS -n
+
+cd $PBS_O_WORKDIR
+
+module load samtools
+module load bwa
+
+#create genome index for pea aphid
+bwa index -p pea_aphid.fna -a is pea_aphid.fna
+
+# map reads to aphid genome
+bwa mem -t 48 -v 3 \
+../pea_aphid.fna \
+../../zipped/Matt_251_R1.fastq.gz \
+../../zipped/Matt_251_R2.fastq.gz \
+> alignment_251.sam
+
+#keep only reads that did not map and the mate did not map
+samtools view -@ 48 -u -f 12 -F 256 alignment_251.sam > aphid_unmapped_251.bam
+
+#sort bam file for subsequent step
+samtools sort -@ 48 -n aphid_unmapped_251.bam -o aphid_unmapped_sorted_251.bam
+
+#create paired fastq files from unmapped bam file
+samtools fastq aphid_unmapped_sorted_251.bam \
+-1 aphid_unmapped_sorted_251_1.fastq \
+-2 aphid_unmapped_sorted_251_2.fastq \
+-0 Something_251.txt -s SomethingElse_251.txt -n
+
+#create genome index for pandora
+bwa index -p ../pandora_canu_pilon.fasta -a is ../pandora_canu_pilon.fasta
+
+#map reads to pandora genome and pipe output straight to bam
+bwa mem -t 48 -v 3 \
+../pandora_canu_pilon.fasta \
+./aphid_unmapped_sorted_251_1.fastq \
+./aphid_unmapped_sorted_251_2.fastq \
+| samtools sort -@ 32 -o pandora_sorted_251.bam -

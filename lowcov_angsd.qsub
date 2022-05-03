@@ -1,0 +1,36 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l partition=beacon,nodes=1:ppn=16,walltime=3:00:00:00,qos=long-utk
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/pandora/novaseq/angsd/log/
+#PBS -e /lustre/haven/user/wbrewer5/pandora/novaseq/angsd/error/
+#PBS -N angsd_pandora
+#PBS -n
+
+cd $PBS_WORKDIR
+
+module load samtools
+
+#create a list of every bam file in the working directory
+find $PWD -type f -path '*.bam' > bam.filelist
+
+#index the bam files for random access
+for b in ./*bam
+
+do
+  samtools index $b
+done
+
+module load python3
+source $ANACONDA3_SH
+conda activate angsd
+
+#generate genotype likelihood using samtools model
+angsd -bam bam.filelist -GL -out AF -doGLF 2
+
+#Use genotype likelihood model to estimate allele frequency
+angsd -bam bam.filelist -doMajorMinor 1 -doMaf 4 -GL 1 -out AF
+
+#pcangsd 

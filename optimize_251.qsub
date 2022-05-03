@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l partition=bigmem,nodes=1:ppn=48,walltime=1:00:00:00
+#PBS -A ACF-UTK0011
+#PBS -M wbrewer5@vols.utk.edu
+#PBS -m abe
+#PBS -o /lustre/haven/user/wbrewer5/pandora/novaseq/abyss/251/log/
+#PBS -e /lustre/haven/user/wbrewer5/pandora/novaseq/abyss/251/error/
+#PBS -N 251_big_illumina_abyss
+#PBS -n
+
+cd $PBS_O_WORKDIR
+
+module load anaconda3
+source $ANACONDA3_SH
+conda activate abyss
+
+for kc in 2 3; do
+	for k in `seq 102 5 192`; do
+		mkdir k${k}-kc${kc}
+		abyss-pe -C k${k}-kc${kc} name=251_optimize j=48 B=2G k=$k kc=$kc \
+		in='/lustre/haven/user/wbrewer5/pandora/novaseq/abyss/251/aphid_unmapped_sorted_251_40x_1.fastq /lustre/haven/user/wbrewer5/pandora/novaseq/abyss/251/aphid_unmapped_sorted_251_40x_2.fastq' 
+	done
+done
+abyss-fac k*/pandora-scaffolds.fa
